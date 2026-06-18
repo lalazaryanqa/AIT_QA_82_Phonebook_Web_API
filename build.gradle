@@ -10,11 +10,75 @@ repositories {
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+//    implementation 'org.seleniumhq.selenium:selenium-java:4.26.0'
+//    implementation 'org.testng:testng:7.11.0'
+//
+//    compileOnly 'org.projectlombok:lombok:1.18.32'
+//    annotationProcessor 'org.projectlombok:lombok:1.18.32'
+//    testCompileOnly 'org.projectlombok:lombok:1.18.32'
+//    testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+//
+//    implementation 'net.datafaker:datafaker:2.5.2'
+//    implementation 'ch.qos.logback:logback-classic:1.5.18'
+
+    implementation 'org.seleniumhq.selenium:selenium-java:4.26.0'
+    implementation 'org.testng:testng:7.11.0'
+
+    compileOnly 'org.projectlombok:lombok:1.18.46'
+    annotationProcessor 'org.projectlombok:lombok:1.18.46'
+    testCompileOnly 'org.projectlombok:lombok:1.18.46'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.46'
+
+    implementation 'net.datafaker:datafaker:2.5.2'
+    implementation 'ch.qos.logback:logback-classic:1.5.18'
+
+
 }
 
 test {
-    useJUnitPlatform()
+    useTestNG()
+}
+
+test {
+    useTestNG() {
+        suites 'src/test/resources/testing.xml'
+    }
+}
+
+tasks.register('qa') {
+    dependsOn test
+}
+
+test {
+    useTestNG() {
+        def suite = System.getProperty('suite', '')
+        if (suite.equals('login_registration')) {
+            suites 'src/test/resources/testing.xml'
+        }else if (suite.equals('add contact')){
+            suites 'src/test/resources/add_contact.xml'
+        } else {
+            suites 'src/test/resources/testing.xml'
+        }
+    }
+}
+
+    tasks.register('qa1') {
+        dependsOn test
+    }
+
+///
+tasks.register('scope', Test) {
+    useTestNG() {
+        suites 'src/test/resources/scope.xml'
+    }
+}
+
+tasks.register('groups', Test) {
+    useTestNG() {
+        def groups = System.getProperty('groups')
+        if(groups != null){
+            includeGroups groups
+        }
+        suites 'src/test/resources/base.xml'
+    }
 }
